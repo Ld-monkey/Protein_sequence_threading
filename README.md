@@ -1,4 +1,4 @@
-# Proteine sequence threading by double dynamic programming
+# Protein sequence threading by double dynamic programming
 
 ## Introduction :
 Développement d'un programme en python 3 permettant de prédire la structure tertiaire de la protéine d'intérêt.

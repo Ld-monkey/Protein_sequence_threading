@@ -24,16 +24,16 @@ def matrice_distance(dataframe, indice)
 """
 
 # Retourne la distance euclidienne entre 2 acides aminés.
-def euclidean_distance(dataframe, index):
+def euclidean_distance(dataframe, index, position = 1):
     # Coordonnée euclidienne de premier AA.
     xa = float(dataframe.iloc[index, 2])
     ya = float(dataframe.iloc[index, 3])
     za = float(dataframe.iloc[index, 4])
 
     # Coordonnée euclidienne du second AA.
-    xb = float(dataframe.iloc[(index + 1), 2])
-    yb = float(dataframe.iloc[(index + 1), 3])
-    zb = float(dataframe.iloc[(index + 1), 4])
+    xb = float(dataframe.iloc[(position), 2])
+    yb = float(dataframe.iloc[(position), 3])
+    zb = float(dataframe.iloc[(position), 4])
 
     # Application de la formule euclidienne.
     distance = math.sqrt(((xb - xa)**2 + (yb - ya)**2 + (zb - za)**2 ))
@@ -41,7 +41,6 @@ def euclidean_distance(dataframe, index):
 
 
 if __name__ == '__main__':
-
 
     # Message du début de programme.
     begin_message()
@@ -93,10 +92,21 @@ if __name__ == '__main__':
     #print(amino_acide_array.iloc[1, [0, 2, 3, 4]])
 
     # Application de la fonction euclidienne.
-    print("La distance euclidienne entre {} et {} = {} Angstrom.".format(
+    print("La distance euclidienne entre {} et {} = {} Angstrom.\n".format(
         amino_acide_array.iloc[0, 0],
         amino_acide_array.iloc[1, 0],
         euclidean_distance(amino_acide_array, index = 0)))
 
     # Faire une boucle pour construire un matrice de conctat.
+    for i in range(0, len(amino_acide_array) - 1):
+        print("Pour l'acide aminé {} :".format(amino_acide_array.iloc[i, 0]))
+        for y in range(0, len(amino_acide_array) - 1):
+            print(euclidean_distance(amino_acide_array, i, y))
+        print("---------------------")
 
+    # [] - A partir de la double boucle créer un tableau (matrice a une dimension)
+    # des distances pour un acidé aminé donné.
+
+    # [] - A partir des différents tableau créer une dataframe (ou matrice de contact)
+
+    # Afficher la Dataframe (matrice de distance).

@@ -1,3 +1,4 @@
+
 import pandas as pd
 import numpy as np
 import math
@@ -77,14 +78,13 @@ if __name__ == '__main__':
     newline()
 
     # Faire une boucle pour construire un matrice de conctat.
-    index_aa = list()
     values_numpy = []
+    index_aa = list(amino_acide_array['AA'])
 
     # Création d'une matrice de contact dans une dataframe.
-    for i in range(0, len(amino_acide_array) - 1):
+    for i in range(0, len(amino_acide_array)):
         values_list = list()
-        index_aa.append(amino_acide_array.iloc[i, 0])
-        for y in range(0, len(amino_acide_array) - 1):
+        for y in range(0, len(amino_acide_array)):
             values_list.append(euclidean_distance(amino_acide_array, i, y))
         values_numpy.append(values_list)
 

@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import math
 
 # Message d'information apparait à l'ouverture du programme.
@@ -7,21 +8,9 @@ def begin_message():
     print("Built date : September 2019")
     print("usage : python3 main_threader.py\n")
 
-"""
-# Construire une classe Acide_aminé qui contiendrait toutes
-les caractéristiques d'un AA => son nom et coordonnée x, y, z.
-Mais attention on risque d'avoir des AA de meme nom.
-Donc est-ce intelligent de construire plusieurs objets ou
-une matrice.  bonne question
-
-# Pour un ensemble d'objet (pas mal).
-def matrice_distance(residue A, residue B):
-  calcul euclidien
-
-# Si matrice
-def matrice_distance(dataframe, indice)
-  calcul euclidien
-"""
+# Fonction qui ajoute une nouvelle ligne en output.
+def newline():
+    print("")
 
 # Retourne la distance euclidienne entre 2 acides aminés.
 def euclidean_distance(dataframe, index, position = 1):
@@ -68,7 +57,7 @@ if __name__ == '__main__':
                 # Ajout de l'index dans un tableau.
                 index_label.append(numero_list)
 
-                # Ajout dans un le dictionnaire.
+                # Ajout dans le dictionnaire.
                 dict_seq_c_alpha['AA'].append(line[17: 20].strip())
                 dict_seq_c_alpha['num_list'].append(line[22: 26].strip())
                 dict_seq_c_alpha['x'].append(line[30: 38].strip())
@@ -85,28 +74,24 @@ if __name__ == '__main__':
     # Affichage de la DataFrame.
     print(amino_acide_array)
 
-    # Extration des données de la DataFrame.
-    # Extraction de la premier ligne
-    #print(amino_acide_array.iloc[0, [0, 2, 3, 4]])
-    # Extraction de la deuxième ligne
-    #print(amino_acide_array.iloc[1, [0, 2, 3, 4]])
-
-    # Application de la fonction euclidienne.
-    print("La distance euclidienne entre {} et {} = {} Angstrom.\n".format(
-        amino_acide_array.iloc[0, 0],
-        amino_acide_array.iloc[1, 0],
-        euclidean_distance(amino_acide_array, index = 0)))
+    newline()
 
     # Faire une boucle pour construire un matrice de conctat.
+    index_aa = list()
+    values_numpy = []
+
+    # Création d'une matrice de contact dans une dataframe.
     for i in range(0, len(amino_acide_array) - 1):
-        print("Pour l'acide aminé {} :".format(amino_acide_array.iloc[i, 0]))
+        values_list = list()
+        index_aa.append(amino_acide_array.iloc[i, 0])
         for y in range(0, len(amino_acide_array) - 1):
-            print(euclidean_distance(amino_acide_array, i, y))
-        print("---------------------")
+            values_list.append(euclidean_distance(amino_acide_array, i, y))
+        values_numpy.append(values_list)
 
-    # [] - A partir de la double boucle créer un tableau (matrice a une dimension)
-    # des distances pour un acidé aminé donné.
-
-    # [] - A partir des différents tableau créer une dataframe (ou matrice de contact)
+    # Assemblage de la DataFrame.
+    dataframe_aa = pd.DataFrame(data = values_numpy,
+                                index = index_aa,
+                                columns = index_aa)
 
     # Afficher la Dataframe (matrice de distance).
+    print(dataframe_aa)

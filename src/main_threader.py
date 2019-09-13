@@ -1,7 +1,6 @@
-
 import pandas as pd
-import numpy as np
 import math
+import re
 
 # Message d'information apparait à l'ouverture du programme.
 def begin_message():
@@ -27,7 +26,7 @@ def euclidean_distance(dataframe, index, position = 1):
     zb = float(dataframe.iloc[(position), 4])
 
     # Application de la formule euclidienne.
-    distance = math.sqrt(((xb - xa)**2 + (yb - ya)**2 + (zb - za)**2 ))
+    distance = math.sqrt(( (xb - xa)**2 + (yb - ya)**2 + (zb - za)**2 ))
     return distance
 
 
@@ -96,3 +95,14 @@ if __name__ == '__main__':
 
     # Afficher la Dataframe (matrice de distance).
     print(dataframe_aa)
+
+    compteur_inutile = 0
+
+    # Ouvrir le fichier dope.par qui contient les forces statiques.
+    with open("../data/2019-13-10/dope.par", "r") as dope_file:
+        for line in dope_file:
+            # Selectionner les couples AA en fonction de leurs carbones alphas.
+            if re.search("[A-Z]{3}\sCA\s[A-Z]{3}\sCA", line) is not None:
+                print(line)
+
+    print(compteur_inutile)

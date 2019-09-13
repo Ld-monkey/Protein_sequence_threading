@@ -5,6 +5,7 @@ import math
 
 # Message d'information apparait à l'ouverture du programme.
 def begin_message():
+
     print("THREADER - Protein Sequence Threading Program")
     print("Built date : September 2019")
     print("usage : python3 main_threader.py\n")

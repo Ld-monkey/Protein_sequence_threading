@@ -31,3 +31,6 @@ python3 main_threader.py
 
 ## Resultats :
 
+## Objectifs :
+
+[] - Ajouter un environnement conda avec un fichier .yml .

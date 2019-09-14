@@ -122,10 +122,20 @@ if __name__ == '__main__':
     # Example de distance récupérer pour un couple AA : example ASN - ASN.
     distance = 0.0
 
-    #Extraire la distance la plus proche.
+    # Extraire le potentiel statistique par rapport a la distance la plus proche.
     for i in range(0, len(Asn_Asn_dataframe.columns)):
         if Asn_Asn_dataframe.columns[i] >= distance:
             print(Asn_Asn_dataframe.iloc[0,i])
             # Valeur absolue pour faciliter la programmation dynamique.
             print(abs(float(Asn_Asn_dataframe.iloc[0,i])))
             break
+
+    pairwaise_amino_acide = []
+    # Extraire l'ensemble des couples AA pour notre sequence.
+    for i in  range(0,len(amino_acide_array['AA'])):
+        for y in  range(i,len(amino_acide_array['AA'])):
+            pairwaise_amino_acide.append([amino_acide_array.iloc[i,0],
+                                          amino_acide_array.iloc[(y),0]])
+
+    # Affiche la table de tout les couples possibles.
+    print(pairwaise_amino_acide)

@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import math
 import re
 
@@ -96,13 +97,35 @@ if __name__ == '__main__':
     # Afficher la Dataframe (matrice de distance).
     print(dataframe_aa)
 
-    compteur_inutile = 0
+    Asn_Asn = list()
 
     # Ouvrir le fichier dope.par qui contient les forces statiques.
     with open("../data/2019-13-10/dope.par", "r") as dope_file:
         for line in dope_file:
             # Selectionner les couples AA en fonction de leurs carbones alphas.
-            if re.search("[A-Z]{3}\sCA\s[A-Z]{3}\sCA", line) is not None:
-                print(line)
+            if re.search("[A-Z]{3}\sCA\s[A-Z]{3}\sCA", line):
+                if re.search("^ASN\s[A-Z]{2}\sASN\s[A-Z]{2}", line):
+                    Asn_Asn = line[13:].rsplit()
 
-    print(compteur_inutile)
+    # Création de la colonne pour le dataframe.
+    x = [i for i in np.arange(0.25, (0.25*31), 0.25, float)]
+
+    # Création d'un dataframe de potentiel statistique pour le couple
+    # ASN - CA - ASN - CA
+    print("Pour ASN - CA - ASN - CA :")
+    Asn_Asn_dataframe = pd.DataFrame([Asn_Asn], columns = x, index = ["E"])
+    print(Asn_Asn_dataframe)
+
+    # Association d'un couple AA en fonction de leur distance
+    # pour obtenir leurs de potentiels statistes respectifs.
+
+    # Example de distance récupérer pour un couple AA : example ASN - ASN.
+    distance = 0.0
+
+    #Extraire la distance la plus proche.
+    for i in range(0, len(Asn_Asn_dataframe.columns)):
+        if Asn_Asn_dataframe.columns[i] >= distance:
+            print(Asn_Asn_dataframe.iloc[0,i])
+            # Valeur absolue pour faciliter la programmation dynamique.
+            print(abs(float(Asn_Asn_dataframe.iloc[0,i])))
+            break

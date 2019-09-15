@@ -1,17 +1,20 @@
 # Protein sequence threading by double dynamic programming
 
 ## Introduction :
-Développement d'un programme en python 3 permettant de prédire une structure tertiaire a partir d'une séquence d'acide aminée .
+Développement d'un programme en python 3 permettant de prédire une structure tertiaire a partir d'une séquence d'acide aminée.
 
 ## Architecture du projet :
 ```bash
 .
 ├── bin
+├── conda_threader.yml
 ├── data
-│   └── 2019-09-10
-│       ├── 2xri.fasta
-│       ├── 2xri.fasta.txt
-│       └── 2xri.pdb
+│   ├── 2019-09-10
+│   │   ├── 2xri.fasta
+│   │   ├── 2xri.fasta.txt
+│   │   └── 2xri.pdb
+│   └── 2019-13-10
+│       └── dope.par
 ├── doc
 ├── README.md
 ├── results
@@ -58,3 +61,4 @@ conda env remove -n conda_threader
 ## Objectifs :
 
 - [x] Ajouter un environnement conda avec un fichier yaml .
+- [ ] Faire une matrice de bas niveau (low matrix).

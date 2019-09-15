@@ -131,6 +131,7 @@ if __name__ == '__main__':
             break
 
     pairwise_amino_acide = []
+
     # Extraire l'ensemble des couples AA pour notre sequence.
     for i in  range(0,len(amino_acide_array['AA'])):
         for y in  range(i,len(amino_acide_array['AA'])):
@@ -142,11 +143,58 @@ if __name__ == '__main__':
     # Affiche la table de tout les couples possibles.
     print(pairwise_amino_acide)
 
+    # Créer un liste d'expression regulière
+    expr_regular_pairwise = []
+
+    # Faire un tableau d'expressions régulières.
+    for i in range(0, len(pairwise_amino_acide)):
+        expr_regular = "^"+pairwise_amino_acide[i][0]+"\s[A-Z]{2}\s"+pairwise_amino_acide[i][1]+"\s[A-Z]{2}"
+        expr_regular_pairwise.append([expr_regular])
+
+    #print(expr_regular_pairwise)
+    #print(expr_regular_pairwise[0][0])
+
+    # Lorsque dans un la comparaison de la ligne on trouve une paire
+    # AA correspondant au notre liste de tous les couples possibles
+    #==> on crée un dataframe associée.
     # Extraire le potentiel statistique pour chaque couple et le convertir
     # en dataframe.
-    for i in range(0, len(Asn_Asn_dataframe.columns)):
-        if Asn_Asn_dataframe.columns[i] >= distance:
-            print(Asn_Asn_dataframe.iloc[0,i])
-            # Valeur absolue pour faciliter la programmation dynamique.
-            print(abs(float(Asn_Asn_dataframe.iloc[0,i])))
-            break
+
+    # Exemple de string contennant les potentiels statistique.
+    string_file = "ALA CA ALA CA 10.00 10.00 10.00 10.00 10.00 10.00 10.00 -1.64 1.02 -0.00 -1.23 -0.62 -0.63 0.33 0.58 0.48 0.10 -0.33 -0.07 -0.30 -0.25 -0.16 0.02 0.03 -0.08 0.01 -0.02 -0.08 -0.12 -0.02"+"ALA CA LEU CA 10.00 10.00 10.00 10.00 10.00 10.00 4.41 0.89 -0.94 -1.33 -0.11 -0.57 -0.21 -0.47 0.08 0.20 0.12 -0.11 -0.16 -0.30 -0.06 0.01 -0.07 0.01 0.06 0.01 -0.00 -0.04 -0.03 -0.02"
+
+    print(pairwise_amino_acide[0][0]+
+          pairwise_amino_acide[0][1])
+
+    # Création de la colonne pour le dataframe.
+    x = [i for i in np.arange(0.25, (0.25*31), 0.25, float)]
+
+    # Création d'un dictionnaire avec les cles AA.
+    potentiel_statistique_dict = dict()
+
+    compteur_inutile = 0
+
+    # On créer un dictionnaire de key car il ne peut exister qu'un seul
+    # couple possible associé au nom de ce couple exemple key : ASNASN.
+    with open("../data/2019-13-10/dope.par", "r") as dope_file:
+        for line in dope_file:
+            if re.search("[A-Z]{3}\sCA\s[A-Z]{3}\sCA", line):
+                for i in range(0, len(expr_regular_pairwise)):
+                    #print(expr_regular_pairwise[i][0])
+                    if re.search(expr_regular_pairwise[i][0], line):
+                        temporaire_list = list()
+                        temporaire_list = line[13:].rsplit()
+                        temporaire_name = pairwise_amino_acide[i][0]+pairwise_amino_acide[i][1]
+                        #print(temporaire_name)
+                        potentiel_statistique_dict[temporaire_name] = pd.DataFrame([temporaire_list], columns = x, index = ["E"])
+                        compteur_inutile +=1
+
+    print(compteur_inutile)
+
+    #print(potentiel_statistique_dict.keys())
+
+    # Par exemple pour le coucple LEU SER = LEUSER
+    print(potentiel_statistique_dict.get('LEUSER'))
+
+    # Ensuite en fonction qui créer un low matricre (dataframe) associé a une
+    # une séquence donnée et qui pioche toutes les informations 

@@ -130,12 +130,23 @@ if __name__ == '__main__':
             print(abs(float(Asn_Asn_dataframe.iloc[0,i])))
             break
 
-    pairwaise_amino_acide = []
+    pairwise_amino_acide = []
     # Extraire l'ensemble des couples AA pour notre sequence.
     for i in  range(0,len(amino_acide_array['AA'])):
         for y in  range(i,len(amino_acide_array['AA'])):
-            pairwaise_amino_acide.append([amino_acide_array.iloc[i,0],
-                                          amino_acide_array.iloc[(y),0]])
+            pairwise_amino_acide.append([amino_acide_array.iloc[i,0],
+                                          amino_acide_array.iloc[y,0]])
+
+    newline()
 
     # Affiche la table de tout les couples possibles.
-    print(pairwaise_amino_acide)
+    print(pairwise_amino_acide)
+
+    # Extraire le potentiel statistique pour chaque couple et le convertir
+    # en dataframe.
+    for i in range(0, len(Asn_Asn_dataframe.columns)):
+        if Asn_Asn_dataframe.columns[i] >= distance:
+            print(Asn_Asn_dataframe.iloc[0,i])
+            # Valeur absolue pour faciliter la programmation dynamique.
+            print(abs(float(Asn_Asn_dataframe.iloc[0,i])))
+            break

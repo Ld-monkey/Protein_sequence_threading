@@ -1,0 +1,10 @@
+name: conda_threader
+channels:
+  - defaults
+  - bioconda
+  - conda-forge
+dependencies:
+  - numpy=1.16.5
+  - numpy-base=1.16.5
+  - pandas=0.25.1
+  - python=3.7.4

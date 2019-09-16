@@ -256,11 +256,21 @@ if __name__ == '__main__':
 
     # Création d'une matrice de haut niveau
     hight_matrix = np.full((10, 10), None)
+    hight_matrix_seq = pd.DataFrame(hight_matrix,
+                                    columns = index_aa,
+                                    index = index_label)
     newline()
     print("La matrice de haut niveau (hight matrix)")
 
     # Ajouter la valeur dans la hight matrix.
-    hight_matrix[0][0] = final_score
+    hight_matrix_seq.iloc[0,0] = final_score
 
-    # Afficher la matrice.
-    print(hight_matrix)
+    # Afficher la hight_matrix.
+    print(hight_matrix_seq)
+
+    # Une fois la premiere low matrice faire il faut
+    # fois les autres propositions de low matrice a
+    # réaliser a partir de la position initiale de la
+    # high level.
+
+

@@ -98,39 +98,10 @@ if __name__ == '__main__':
     # Afficher la Dataframe (matrice de distance).
     print("La matrice de distance :")
     print(dataframe_aa)
-
-    Asn_Asn = list()
-
-    # Ouvrir le fichier dope.par qui contient les forces statiques.
-    with open("../data/2019-13-10/dope.par", "r") as dope_file:
-        for line in dope_file:
-            # Selectionner les couples AA en fonction de leurs carbones alphas.
-            if re.search("[A-Z]{3}\sCA\s[A-Z]{3}\sCA", line):
-                if re.search("^ASN\s[A-Z]{2}\sASN\s[A-Z]{2}", line):
-                    Asn_Asn = line[13:].rsplit()
-
     # Création de la colonne pour le dataframe.
     x = [i for i in np.arange(0.25, (0.25*31), 0.25, float)]
 
-    # Création d'un dataframe de potentiel statistique pour le couple
-    # ASN - CA - ASN - CA
-    #print("Pour ASN - CA - ASN - CA :")
-    Asn_Asn_dataframe = pd.DataFrame([Asn_Asn], columns = x, index = ["E"])
-    #print(Asn_Asn_dataframe)
-
-    # Association d'un couple AA en fonction de leur distance
-    # pour obtenir leurs de potentiels statistes respectifs.
-
-    # Example de distance récupérer pour un couple AA : example ASN - ASN.
-    distance = 0.0
-
-    # Extraire le potentiel statistique par rapport a la distance la plus proche.
-    for i in range(0, len(Asn_Asn_dataframe.columns)):
-        if Asn_Asn_dataframe.columns[i] >= distance:
-            #print(Asn_Asn_dataframe.iloc[0,i])
-            # Valeur absolue pour faciliter la programmation dynamique.
-            #print(abs(float(Asn_Asn_dataframe.iloc[0,i])))
-            break
+    print(amino_acide_array)
 
     pairwise_amino_acide = []
 
@@ -143,7 +114,7 @@ if __name__ == '__main__':
     newline()
 
     # Affiche la table de tout les couples possibles.
-    #print(pairwise_amino_acide)
+    print(pairwise_amino_acide)
 
     # Créer un liste d'expression regulière
     expr_regular_pairwise = []
@@ -153,7 +124,7 @@ if __name__ == '__main__':
         expr_regular = "^"+pairwise_amino_acide[i][0]+"\s[A-Z]{2}\s"+pairwise_amino_acide[i][1]+"\s[A-Z]{2}"
         expr_regular_pairwise.append([expr_regular])
 
-    #print(expr_regular_pairwise)
+    print(expr_regular_pairwise)
     #print(expr_regular_pairwise[0][0])
 
     # Lorsque dans un la comparaison de la ligne on trouve une paire
@@ -182,36 +153,17 @@ if __name__ == '__main__':
                         #print(temporaire_name)
                         potentiel_statistique_dict[temporaire_name] = pd.DataFrame([temporaire_list], columns = x, index = ["E"])
 
-    #print(potentiel_statistique_dict.keys())
-
-    # Par exemple pour le coucple LEU SER = LEUSER
-    #print(potentiel_statistique_dict.get('LEUSER'))
-
-    # Ensuite en fonction qui créer un low matricre (dataframe) associé a une
-    # une séquence donnée et qui pioche toutes les informations
-
-
-    # Extraire le potentiel statistique par rapport a la distance la plus proche.
-    for i in range(0, len(potentiel_statistique_dict['ASNASN'].columns)):
-        if potentiel_statistique_dict['ASNASN'].columns[i] >= distance:
-            #print(potentiel_statistique_dict['ASNASN'].iloc[0,i])
-            #print(abs(float(potentiel_statistique_dict['ASNASN'].iloc[0,i])))
-            break
-
-    #low_matrix = pd.Dataframe(data = , index = , columns = )
-    # Pour constuire la low-matrix : pour chaque couples AA recupérer
-    #la distance et la convertir en potentiel statistique.
+    print(potentiel_statistique_dict.keys())
 
     # Récuperer le couple a partir de la matrice de contact
     #print(dataframe_aa.columns[0])
     #print(dataframe_aa.index[1])
     #print(dataframe_aa.iloc[0,0])
-
     #print(potentiel_statistique_dict.keys())
+
     #print(pairwise_amino_acide)
 
     potentiel_statistique_array = list()
-
     compteur_inutile = 0
     compteur_inutile_2 = 0
 
@@ -219,6 +171,11 @@ if __name__ == '__main__':
         for y in range(0, len(dataframe_aa.index)):
             #print(dataframe_aa.index[i]+dataframe_aa.columns[y])
             temporaire_key = dataframe_aa.index[i]+dataframe_aa.columns[y]
+
+            # Atention erreur grossière peut etre que dans le potentil statistique:
+
+            # ASN -> LEU c'est pas la meme chose que LEU - > ASN a verifier !!!.
+            # car on a developper un algorithme qui concidère que c'est la meme chose.
             if temporaire_key not in potentiel_statistique_dict.keys():
                 temporaire_key = dataframe_aa.index[y]+dataframe_aa.columns[i]
                 #print("inverse")
@@ -228,17 +185,22 @@ if __name__ == '__main__':
             #print(temporaire_key)
             distance = dataframe_aa.iloc[i,y]
             #print(distance)
-            for z in range(0, len(potentiel_statistique_dict[temporaire_key].columns)):
-                if potentiel_statistique_dict[temporaire_key].columns[z] >= distance:
-                    #print(abs(float(potentiel_statistique_dict[temporaire_key].iloc[0,z])))
-                    potentiel_statistique_array.append(abs(float(potentiel_statistique_dict[temporaire_key].iloc[0,z])))
-                    compteur_inutile_2 += 1
-                    break
-                # cutoff
-                if distance > potentiel_statistique_dict[temporaire_key].columns[-1]:
-                    potentiel_statistique_array.append(abs(float(potentiel_statistique_dict[temporaire_key].iloc[0,-1])))
-                    compteur_inutile_2 +=1
-                    break
+
+            # Si ce sont les memes acides aminés = 0.0
+            if dataframe_aa.index[i] == dataframe_aa.columns[y]:
+                potentiel_statistique_array.append(float(0.0))
+            else :
+                for z in range(0, len(potentiel_statistique_dict[temporaire_key].columns)):
+                    if potentiel_statistique_dict[temporaire_key].columns[z] >= distance:
+                        #print(abs(float(potentiel_statistique_dict[temporaire_key].iloc[0,z])))
+                        potentiel_statistique_array.append(abs(float(potentiel_statistique_dict[temporaire_key].iloc[0,z])))
+                        compteur_inutile_2 += 1
+                        break
+                    # cutoff
+                    if distance > potentiel_statistique_dict[temporaire_key].columns[-1]:
+                        potentiel_statistique_array.append(abs(float(potentiel_statistique_dict[temporaire_key].iloc[0,-1])))
+                        compteur_inutile_2 +=1
+                        break
 
 
     #print(compteur_inutile)
@@ -258,9 +220,47 @@ if __name__ == '__main__':
                                   index = index_label)
 
     # Affichage de la première low matrice.
-    print("Première low_matrice :")
+    print("Première low_matrix :")
     print(low_matrix_seq)
 
-    # Atention erreur grossière peut etre que dans le potentil statistique:
-    # ASN -> LEU c'est pas la meme chose que LEU - > ASN a verifier !!!.
-    # car on a developper un algorithme qui concidère que c'est la meme chose.
+    # Faire la première programmation dynamique et associer la dernière valeur
+    # obtenue dans la hight matrix.
+
+    # Création de l'index.
+    i = 0
+    y = 0
+    final_score = low_matrix_seq.iloc[0,0]
+
+    newline()
+
+    while (y < (len(low_matrix_seq.columns)-1) and i < (len(low_matrix_seq.index)-1)):
+        if low_matrix_seq.iloc[i, y+1] < low_matrix_seq.iloc[i+1, y+1] and low_matrix_seq.iloc[i, y+1] < low_matrix_seq.iloc[i+1, y]:
+            #print("->")
+            #print(i,y)
+            final_score = low_matrix_seq.iloc[i, y+1]
+            y += 1
+            #print(i, y)
+        elif low_matrix_seq.iloc[i+1, y+1] < low_matrix_seq.iloc[i, y+1] and low_matrix_seq.iloc[i+1, y+1] < low_matrix_seq.iloc[i+1, y]:
+            #print("\>")
+            final_score = low_matrix_seq.iloc[i+1, y+1]
+            i += 1
+            y += 1
+            #print(i)
+            #print(y)
+        else:
+            final_score = low_matrix_seq.iloc[i+1, y]
+            #print("|")
+            i +=1
+
+    print("Le score final est :",final_score)
+
+    # Création d'une matrice de haut niveau
+    hight_matrix = np.full((10, 10), None)
+    newline()
+    print("La matrice de haut niveau (hight matrix)")
+
+    # Ajouter la valeur dans la hight matrix.
+    hight_matrix[0][0] = final_score
+
+    # Afficher la matrice.
+    print(hight_matrix)

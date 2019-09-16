@@ -74,6 +74,7 @@ if __name__ == '__main__':
                                      index = index_label)
 
     # Affichage de la DataFrame.
+    print("Sortie du fichier .pdb :")
     print(amino_acide_array)
 
     newline()
@@ -95,6 +96,7 @@ if __name__ == '__main__':
                                 columns = index_aa)
 
     # Afficher la Dataframe (matrice de distance).
+    print("La matrice de distance :")
     print(dataframe_aa)
 
     Asn_Asn = list()
@@ -112,9 +114,9 @@ if __name__ == '__main__':
 
     # Création d'un dataframe de potentiel statistique pour le couple
     # ASN - CA - ASN - CA
-    print("Pour ASN - CA - ASN - CA :")
+    #print("Pour ASN - CA - ASN - CA :")
     Asn_Asn_dataframe = pd.DataFrame([Asn_Asn], columns = x, index = ["E"])
-    print(Asn_Asn_dataframe)
+    #print(Asn_Asn_dataframe)
 
     # Association d'un couple AA en fonction de leur distance
     # pour obtenir leurs de potentiels statistes respectifs.
@@ -125,9 +127,9 @@ if __name__ == '__main__':
     # Extraire le potentiel statistique par rapport a la distance la plus proche.
     for i in range(0, len(Asn_Asn_dataframe.columns)):
         if Asn_Asn_dataframe.columns[i] >= distance:
-            print(Asn_Asn_dataframe.iloc[0,i])
+            #print(Asn_Asn_dataframe.iloc[0,i])
             # Valeur absolue pour faciliter la programmation dynamique.
-            print(abs(float(Asn_Asn_dataframe.iloc[0,i])))
+            #print(abs(float(Asn_Asn_dataframe.iloc[0,i])))
             break
 
     pairwise_amino_acide = []
@@ -141,7 +143,7 @@ if __name__ == '__main__':
     newline()
 
     # Affiche la table de tout les couples possibles.
-    print(pairwise_amino_acide)
+    #print(pairwise_amino_acide)
 
     # Créer un liste d'expression regulière
     expr_regular_pairwise = []
@@ -160,19 +162,11 @@ if __name__ == '__main__':
     # Extraire le potentiel statistique pour chaque couple et le convertir
     # en dataframe.
 
-    # Exemple de string contennant les potentiels statistique.
-    string_file = "ALA CA ALA CA 10.00 10.00 10.00 10.00 10.00 10.00 10.00 -1.64 1.02 -0.00 -1.23 -0.62 -0.63 0.33 0.58 0.48 0.10 -0.33 -0.07 -0.30 -0.25 -0.16 0.02 0.03 -0.08 0.01 -0.02 -0.08 -0.12 -0.02"+"ALA CA LEU CA 10.00 10.00 10.00 10.00 10.00 10.00 4.41 0.89 -0.94 -1.33 -0.11 -0.57 -0.21 -0.47 0.08 0.20 0.12 -0.11 -0.16 -0.30 -0.06 0.01 -0.07 0.01 0.06 0.01 -0.00 -0.04 -0.03 -0.02"
-
-    print(pairwise_amino_acide[0][0]+
-          pairwise_amino_acide[0][1])
-
     # Création de la colonne pour le dataframe.
     x = [i for i in np.arange(0.25, (0.25*31), 0.25, float)]
 
     # Création d'un dictionnaire avec les cles AA.
     potentiel_statistique_dict = dict()
-
-    compteur_inutile = 0
 
     # On créer un dictionnaire de key car il ne peut exister qu'un seul
     # couple possible associé au nom de ce couple exemple key : ASNASN.
@@ -187,14 +181,86 @@ if __name__ == '__main__':
                         temporaire_name = pairwise_amino_acide[i][0]+pairwise_amino_acide[i][1]
                         #print(temporaire_name)
                         potentiel_statistique_dict[temporaire_name] = pd.DataFrame([temporaire_list], columns = x, index = ["E"])
-                        compteur_inutile +=1
-
-    print(compteur_inutile)
 
     #print(potentiel_statistique_dict.keys())
 
     # Par exemple pour le coucple LEU SER = LEUSER
-    print(potentiel_statistique_dict.get('LEUSER'))
+    #print(potentiel_statistique_dict.get('LEUSER'))
 
     # Ensuite en fonction qui créer un low matricre (dataframe) associé a une
-    # une séquence donnée et qui pioche toutes les informations 
+    # une séquence donnée et qui pioche toutes les informations
+
+
+    # Extraire le potentiel statistique par rapport a la distance la plus proche.
+    for i in range(0, len(potentiel_statistique_dict['ASNASN'].columns)):
+        if potentiel_statistique_dict['ASNASN'].columns[i] >= distance:
+            #print(potentiel_statistique_dict['ASNASN'].iloc[0,i])
+            #print(abs(float(potentiel_statistique_dict['ASNASN'].iloc[0,i])))
+            break
+
+    #low_matrix = pd.Dataframe(data = , index = , columns = )
+    # Pour constuire la low-matrix : pour chaque couples AA recupérer
+    #la distance et la convertir en potentiel statistique.
+
+    # Récuperer le couple a partir de la matrice de contact
+    #print(dataframe_aa.columns[0])
+    #print(dataframe_aa.index[1])
+    #print(dataframe_aa.iloc[0,0])
+
+    #print(potentiel_statistique_dict.keys())
+    #print(pairwise_amino_acide)
+
+    potentiel_statistique_array = list()
+
+    compteur_inutile = 0
+    compteur_inutile_2 = 0
+
+    for i in range(0, len(dataframe_aa.columns)):
+        for y in range(0, len(dataframe_aa.index)):
+            #print(dataframe_aa.index[i]+dataframe_aa.columns[y])
+            temporaire_key = dataframe_aa.index[i]+dataframe_aa.columns[y]
+            if temporaire_key not in potentiel_statistique_dict.keys():
+                temporaire_key = dataframe_aa.index[y]+dataframe_aa.columns[i]
+                #print("inverse")
+                #print(temporaire_key)
+            compteur_inutile += 1
+
+            #print(temporaire_key)
+            distance = dataframe_aa.iloc[i,y]
+            #print(distance)
+            for z in range(0, len(potentiel_statistique_dict[temporaire_key].columns)):
+                if potentiel_statistique_dict[temporaire_key].columns[z] >= distance:
+                    #print(abs(float(potentiel_statistique_dict[temporaire_key].iloc[0,z])))
+                    potentiel_statistique_array.append(abs(float(potentiel_statistique_dict[temporaire_key].iloc[0,z])))
+                    compteur_inutile_2 += 1
+                    break
+                # cutoff
+                if distance > potentiel_statistique_dict[temporaire_key].columns[-1]:
+                    potentiel_statistique_array.append(abs(float(potentiel_statistique_dict[temporaire_key].iloc[0,-1])))
+                    compteur_inutile_2 +=1
+                    break
+
+
+    #print(compteur_inutile)
+    #print(compteur_inutile_2)
+
+    # On affiche l'ensemble du tableau.
+    #print(potentiel_statistique_array)
+
+    #print(index_label)
+
+    potentiel_statistique_array = np.reshape(potentiel_statistique_array, (10,10))
+    #print(potentiel_statistique_array)
+
+    # Création de la low matrice.
+    low_matrix_seq = pd.DataFrame(potentiel_statistique_array,
+                                  columns = index_aa,
+                                  index = index_label)
+
+    # Affichage de la première low matrice.
+    print("Première low_matrice :")
+    print(low_matrix_seq)
+
+    # Atention erreur grossière peut etre que dans le potentil statistique:
+    # ASN -> LEU c'est pas la meme chose que LEU - > ASN a verifier !!!.
+    # car on a developper un algorithme qui concidère que c'est la meme chose.

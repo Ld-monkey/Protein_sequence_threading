@@ -172,10 +172,6 @@ if __name__ == '__main__':
             #print(dataframe_aa.index[i]+dataframe_aa.columns[y])
             temporaire_key = dataframe_aa.index[i]+dataframe_aa.columns[y]
 
-            # Atention erreur grossière peut etre que dans le potentil statistique:
-
-            # ASN -> LEU c'est pas la meme chose que LEU - > ASN a verifier !!!.
-            # car on a developper un algorithme qui concidère que c'est la meme chose.
             if temporaire_key not in potentiel_statistique_dict.keys():
                 temporaire_key = dataframe_aa.index[y]+dataframe_aa.columns[i]
                 #print("inverse")
@@ -233,6 +229,7 @@ if __name__ == '__main__':
 
     newline()
 
+    # programmation dynamique
     while (y < (len(low_matrix_seq.columns)-1) and i < (len(low_matrix_seq.index)-1)):
         if low_matrix_seq.iloc[i, y+1] < low_matrix_seq.iloc[i+1, y+1] and low_matrix_seq.iloc[i, y+1] < low_matrix_seq.iloc[i+1, y]:
             #print("->")
@@ -273,4 +270,74 @@ if __name__ == '__main__':
     # réaliser a partir de la position initiale de la
     # high level.
 
+    pos_x_hight_matrix = 0
+    pos_y_hight_matrix = 0
 
+    # A droite du point de départ
+    print(hight_matrix_seq.columns[1], hight_matrix_seq.index[0])
+    right_new_sequence = list(hight_matrix_seq.columns)
+
+    # Applique la modification.
+    right_new_sequence[hight_matrix_seq.index[0]-1] = hight_matrix_seq.columns[1]
+    print(right_new_sequence)
+
+    # En diagonale du point de départ
+    print(hight_matrix_seq.columns[1], hight_matrix_seq.index[1])
+    diago_new_sequence = list(hight_matrix_seq.columns)
+    diago_new_sequence[hight_matrix_seq.index[1]-1] = hight_matrix_seq.columns[1]
+    print(diago_new_sequence)
+
+    # En bas du point de départ
+    print(hight_matrix_seq.columns[0], hight_matrix_seq.index[1])
+    botton_new_sequence = list(hight_matrix_seq.columns)
+    botton_new_sequence[hight_matrix_seq.index[1]-1] = hight_matrix_seq.columns[0]
+    print(botton_new_sequence)
+
+    # Création de la low_matrice pour la sequence de droite.
+    # (Faire un fonction pour la low_matrice)
+
+    potentiel_statistique_array = list()
+
+    for i in range(0, len(dataframe_aa.columns)):
+        for y in range(0, len(dataframe_aa.index)):
+            #print(dataframe_aa.index[i]+dataframe_aa.columns[y])
+            temporaire_key = dataframe_aa.index[i]+right_new_sequence[y]
+
+
+            if temporaire_key not in potentiel_statistique_dict.keys():
+                temporaire_key = dataframe_aa.index[y]+right_new_sequence[i]
+                #print("inverse")
+                #print(temporaire_key)
+            print(temporaire_key)
+            distance = dataframe_aa.iloc[i,y]
+            #print(distance)
+
+            # Si ce sont les memes acides aminés = 0.0
+            if dataframe_aa.index[i] == dataframe_aa.columns[y]:
+                potentiel_statistique_array.append(float(0.0))
+            else :
+                for z in range(0, len(potentiel_statistique_dict[temporaire_key].columns)):
+                    if potentiel_statistique_dict[temporaire_key].columns[z] >= distance:
+                        #print(abs(float(potentiel_statistique_dict[temporaire_key].iloc[0,z])))
+                        potentiel_statistique_array.append(abs(float(potentiel_statistique_dict[temporaire_key].iloc[0,z])))
+                        break
+                    # cutoff
+                    if distance > potentiel_statistique_dict[temporaire_key].columns[-1]:
+                        potentiel_statistique_array.append(abs(float(potentiel_statistique_dict[temporaire_key].iloc[0,-1])))
+                        break
+
+
+    potentiel_statistique_array = np.reshape(potentiel_statistique_array, (10,10))
+    #print(potentiel_statistique_array)
+
+    # Création de la low matrice.
+    low_matrix_seq = pd.DataFrame(potentiel_statistique_array,
+                                  columns = right_new_sequence,
+                                  index = index_label)
+
+    # Affichage de la première low matrice.
+    print("2nd low_matrix :")
+    print(low_matrix_seq)
+
+
+    # Tout ce que j'ai fait est faux donc on repart de zero.

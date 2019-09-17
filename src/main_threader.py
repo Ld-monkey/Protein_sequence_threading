@@ -3,7 +3,6 @@ import numpy as np
 import math
 import re
 
-
 def begin_message():
     """ Méthode qui affiche différentes informations au démarrage du programme."""
 
@@ -132,6 +131,23 @@ def create_empty_hight_matrix(lenght_x, lenght_y, columns_names):
                                                       1))
     return hight_matrix_seq
 
+def create_empty_low_matrix(lenght_x, lenght_y, columns_names):
+    """ Méthode qui créé et retourne une matrice de haut niveau."""
+    low_matrix = np.full((lenght_x+1, lenght_y+1), None)
+    for i in range(0, lenght_x+1):
+        low_matrix[0][i] = 0
+        low_matrix[i][0] = 0
+    columns_names = columns_names.insert(0,0)
+    low_matrix_seq = pd.DataFrame(low_matrix,
+                                  columns = columns_names,
+                                  index = np.arange(0,
+                                                    len(columns_names),
+                                                    1))
+    return low_matrix_seq
+
+
+
+
 if __name__ == '__main__':
 
     # Message du début de programme.
@@ -168,6 +184,7 @@ if __name__ == '__main__':
     print(hight_matrix)
 
     # Suite.
+    newline()
 
     aa_hight_matrix = hight_matrix.columns
     ca_hight_matrix = hight_matrix.index
@@ -178,6 +195,10 @@ if __name__ == '__main__':
     pos_x_low_matrix = 0
     pos_y_low_matrix = 0
 
+    print("{} CA{} {} CA{}".format(aa_hight_matrix[pos_y_hight_matrix],
+                                   ca_hight_matrix[pos_x_hight_matrix],
+                                   hight_matrix.columns[pos_y_low_matrix],
+                                   hight_matrix.index[pos_x_low_matrix]))
     pos_y_low_matrix +=1
     print("{} CA{} {} CA{}".format(aa_hight_matrix[pos_y_hight_matrix],
                                    ca_hight_matrix[pos_x_hight_matrix],
@@ -194,4 +215,139 @@ if __name__ == '__main__':
                                    hight_matrix.columns[pos_y_low_matrix],
                                    hight_matrix.index[pos_x_low_matrix]))
 
-    print("Première low matrice")
+    newline()
+    pos_x_hight_matrix = 0
+    pos_y_hight_matrix = 0
+
+    print("HM : AA={}, CA={}".format(aa_hight_matrix[pos_y_hight_matrix],
+                                     ca_hight_matrix[pos_x_hight_matrix]))
+    AA = aa_hight_matrix[pos_y_hight_matrix]
+    CA = ca_hight_matrix[pos_x_hight_matrix]
+
+    print("Création de la low_matrice.")
+
+    low_matrix = create_empty_low_matrix(len(distance_matrix.columns),
+                                         len(distance_matrix.columns),
+                                         distance_matrix.columns)
+    print(low_matrix)
+
+    def built_low_matrix(AA ,pos_AA, pos_hm, low_matrix, pot_stat, matrice_distance):
+        print("built low matrix")
+        x = pos_AA + 1
+        y = pos_hm
+        print(AA)
+        print(pos_AA+1)
+        print(pos_hm)
+        low_matrix.iloc[pos_AA+1,pos_hm] = 16
+        print(low_matrix.iloc[pos_AA+1,pos_hm])
+        print(low_matrix)
+
+        # Ajouter a sur le meme AA une valeur de potentiel statistique
+        temp_key = AA+low_matrix.columns[pos_AA+1]
+        print(temp_key)
+        print(matrice_distance)
+        distance = matrice_distance.iloc[pos_AA, pos_hm-1]
+        print(distance)
+
+        if pos_AA+1 == x and pos_hm == y:
+            rst = 0.0
+        else :
+            for i in range(0, len(pot_stat[temp_key].columns)):
+                if pot_stat[temp_key].columns[i] >= distance:
+                    rst = float(pot_stat[temp_key].iloc[0,i])
+                    break
+
+        low_matrix.iloc[pos_AA+1,pos_hm] = rst
+
+        # Ajouter une valeur au AA en bas
+        print("bas")
+        temp_key = AA+low_matrix.columns[pos_AA+1]
+        print(temp_key)
+        #print(matrice_distance)
+        # [, +1] distance pour aller en bas
+        distance = matrice_distance.iloc[pos_AA, pos_hm-1+1]
+        print(distance)
+
+        # +1 
+        if pos_AA+1+1 == x and pos_hm == y:
+            rst = 0.0
+        else :
+            for i in range(0, len(pot_stat[temp_key].columns)):
+                if pot_stat[temp_key].columns[i] >= distance:
+                    print(pot_stat[temp_key])
+                    rst = float(pot_stat[temp_key].iloc[0,i-1])
+                    print(float(pot_stat[temp_key].iloc[0,i-1]))
+                    break
+
+        low_matrix.iloc[pos_AA+1+1,pos_hm] = rst
+
+        # Ajouter a droite
+        # +1
+        temp_key = AA+low_matrix.columns[pos_AA+1+1]
+        print("droite")
+        print(temp_key)
+        #print(matrice_distance)
+        distance = matrice_distance.iloc[pos_AA+1, pos_hm]
+        print(distance)
+
+        if pos_AA+1+1 == x and pos_hm == y:
+            rst = 0.0
+        else :
+            for i in range(0, len(pot_stat[temp_key].columns)):
+                if pot_stat[temp_key].columns[i] >= distance:
+                    rst = float(pot_stat[temp_key].iloc[0,i])
+                    break
+
+        low_matrix.iloc[pos_AA+1,pos_hm+1] = rst
+
+        # Ajouter en diagonale 
+        temp_key = AA+low_matrix.columns[pos_AA+1+1]
+        print("diagonale")
+        print(temp_key)
+        #print(matrice_distance)
+        distance = matrice_distance.iloc[pos_AA+1, pos_hm+1]
+        print(distance)
+
+        if pos_AA+1+1 == x and pos_hm == y:
+            rst = 0.0
+        else :
+            for i in range(0, len(pot_stat[temp_key].columns)):
+                if pot_stat[temp_key].columns[i] >= distance:
+                    rst = float(pot_stat[temp_key].iloc[0,i])
+                    break
+
+        low_matrix.iloc[pos_AA+1+1,pos_hm+1] = rst
+
+        # ------------------ 2nd chance
+        """
+        # Ajouter a sur le meme AA une valeur de potentiel statistique
+
+        # Ajouter une valeur au AA en bas
+        temp_key = AA+low_matrix.columns[pos_AA+1+1]
+        print(temp_key)
+        #print(matrice_distance)
+        # [+1, +1] distance pour aller en bas
+        distance = matrice_distance.iloc[pos_AA+1+1, pos_hm-1+1+1]
+        print(distance)
+
+        # +1 
+        if pos_AA+1+1+1 == x and pos_hm+1 == y:
+            rst = 0.0
+        else :
+            for i in range(0, len(pot_stat[temp_key].columns)):
+                if pot_stat[temp_key].columns[i] >= distance:
+                    rst = float(pot_stat[temp_key].iloc[0,i])
+                    break
+
+        low_matrix.iloc[pos_AA+1+1+1,pos_hm+1] = rst
+        """
+
+    built_low_matrix(AA,
+                     pos_y_hight_matrix,
+                     CA,
+                     low_matrix,
+                     pot_stat_dict,
+                     distance_matrix)
+
+    print(low_matrix)
+

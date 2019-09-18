@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import math
 import re
+import sys
 
 def begin_message():
     """ Méthode qui affiche différentes informations au démarrage du programme."""
@@ -14,64 +15,78 @@ def newline():
     """ Méthode qui ajoute une nouvelle ligne en output."""
     print("")
 
-def euclidean_distance(dataframe, index, position = 1):
-    """Méthode aui retourne la distance euclidienne entre 2 acides aminés."""
-    xa = float(dataframe.iloc[index, 2])
-    ya = float(dataframe.iloc[index, 3])
-    za = float(dataframe.iloc[index, 4])
-
-    # Coordonnée euclidienne du second AA.
-    xb = float(dataframe.iloc[(position), 2])
-    yb = float(dataframe.iloc[(position), 3])
-    zb = float(dataframe.iloc[(position), 4])
-
-    distance = math.sqrt(( (xb - xa)**2 + (yb - ya)**2 + (zb - za)**2 ))
-    return distance
-
-def read_pdb_file_to_dataframe(pdb_file):
-    """ Méthode qui ouvre un fichier pdb et retourne sous forme de dataframe \
-    les informations nécessaires.
+class ParserPdb_Dope:
     """
-    dict_seq_c_alpha = {'AA':[],
-                        'num_list':[],
-                        'x':[],
-                        'y':[],
-                        'z':[]}
-
-    with open(pdb_file, "r") as contents_pdb:
-        numero_list = 0
-        for line in contents_pdb:
-            if line.startswith("ATOM") and line[12:16].strip() == "CA":
-                numero_list += 1
-                dict_seq_c_alpha['AA'].append(line[17: 20].strip())
-                dict_seq_c_alpha['num_list'].append(line[22: 26].strip())
-                dict_seq_c_alpha['x'].append(line[30: 38].strip())
-                dict_seq_c_alpha['y'].append(line[38: 46].strip())
-                dict_seq_c_alpha['z'].append(line[46: 54].strip())
-            if numero_list == 10:
-                break
-
-    dataframe = pd.DataFrame(data = dict_seq_c_alpha,
-                             index = np.arange(1, numero_list+1, 1))
-    return dataframe
-
-def create_distance_matrix(dataframe):
+    Cette classe permet d'ouvrir le fichier pdb et dope.par.
     """
-    Méthode qui permet de créer un matrice de distance (= matrice de contact).
+    def __init__(self, pdb_file):
+        self.pdb_file = pdb_file
+
+    def read_pdb_file_to_dataframe(self):
+        """ Méthode qui ouvre un fichier pdb et retourne sous forme de dataframe \
+        les informations nécessaires.
+        """
+        dict_seq_c_alpha = {'AA':[],
+                            'num_list':[],
+                            'x':[],
+                            'y':[],
+                            'z':[]}
+
+        with open(self.pdb_file, "r") as contents_pdb:
+            numero_list = 0
+            for line in contents_pdb:
+                if line.startswith("ATOM") and line[12:16].strip() == "CA":
+                    numero_list += 1
+                    dict_seq_c_alpha['AA'].append(line[17: 20].strip())
+                    dict_seq_c_alpha['num_list'].append(line[22: 26].strip())
+                    dict_seq_c_alpha['x'].append(line[30: 38].strip())
+                    dict_seq_c_alpha['y'].append(line[38: 46].strip())
+                    dict_seq_c_alpha['z'].append(line[46: 54].strip())
+                    if numero_list == 10:
+                        break
+
+            dataframe = pd.DataFrame(data = dict_seq_c_alpha,
+                                     index = np.arange(1, numero_list+1, 1))
+            return dataframe
+
+class AcideAmine:
     """
-    values_numpy = []
-    index_and_columns_names = list(dataframe['AA'])
+    Classe représentant l'ensemble des méthoes utilisés pour les acides aminés.
+    """
+    def __init__(self, dataframe):
+        self.dataframe = dataframe
 
-    for i in range(0, len(dataframe)):
-        values_list = []
-        for y in range(0, len(dataframe)):
-            values_list.append(euclidean_distance(dataframe, i, y))
-        values_numpy.append(values_list)
+    def euclidean_distance(self, dataframe, index, position = 1):
+        """Méthode aui retourne la distance euclidienne entre 2 acides aminés."""
+        xa = float(self.dataframe.iloc[index, 2])
+        ya = float(self.dataframe.iloc[index, 3])
+        za = float(self.dataframe.iloc[index, 4])
 
-    dataframe_aa = pd.DataFrame(data = values_numpy,
-                                index = index_and_columns_names,
-                                columns = index_and_columns_names)
-    return dataframe_aa
+        # Coordonnée euclidienne du second AA.
+        xb = float(self.dataframe.iloc[(position), 2])
+        yb = float(self.dataframe.iloc[(position), 3])
+        zb = float(self.dataframe.iloc[(position), 4])
+
+        distance = math.sqrt(( (xb - xa)**2 + (yb - ya)**2 + (zb - za)**2 ))
+        return distance
+
+    def create_distance_matrix(self):
+        """
+        Méthode qui permet de créer un matrice de distance (= matrice de contact).
+        """
+        values_numpy = []
+        index_and_columns_names = list(self.dataframe['AA'])
+
+        for i in range(0, len(self.dataframe)):
+            values_list = []
+            for y in range(0, len(self.dataframe)):
+                values_list.append(self.euclidean_distance(self.dataframe, i, y))
+            values_numpy.append(values_list)
+
+        dataframe_aa = pd.DataFrame(data = values_numpy,
+                                    index = index_and_columns_names,
+                                    columns = index_and_columns_names)
+        return dataframe_aa
 
 def pairwise_amino_acide(dataframe):
     """ Méthode qui revoie l'ensemble des couples AA possibles. """
@@ -142,7 +157,6 @@ def create_empty_low_matrix(lenght_x, lenght_y, columns_names):
     return low_matrix_seq
 
 def find_potentiel_statistique(n, m, p, q, distance, potentiel, temp_key):
-    print("Potentiel_statistique")
     if ( n == p and m == q):
         return 0.0
     if distance > 30*0.25:
@@ -153,28 +167,81 @@ def find_potentiel_statistique(n, m, p, q, distance, potentiel, temp_key):
         for i in range(0, len(potentiel[temp_key].columns)):
             if potentiel[temp_key].columns[i] >= distance:
                 rst = float(potentiel[temp_key].iloc[0,i])
-                print(float(potentiel[temp_key].iloc[0,i]))
-                print(float(potentiel[temp_key].iloc[0,i-1]))
                 break
 
     return rst
 
+def built_low_matrix(pos_x_low_matrix,
+                     pos_y_low_matrix,
+                     aa_fixed_hight_matrix,
+                     pos_x_hight_matrix_fixed_position,
+                     pos_y_hight_matrix_fixed_position,
+                     ca_fixed_hight_matrix,
+                     low_matrix,
+                     potentiel_statistique,
+                     matrice_distance):
+
+    # Ajout d'une cles
+    temps_key = aa_fixed_hight_matrix+low_matrix.columns[pos_y_low_matrix]
+
+    # Calculer une distance.
+    distance = matrice_distance.iloc[pos_y_hight_matrix,
+                                     pos_x_low_matrix]
+
+    energie = find_potentiel_statistique(aa_fixed_hight_matrix,
+                                         ca_fixed_hight_matrix,
+                                         low_matrix.columns[pos_y_low_matrix],
+                                         low_matrix.index[pos_x_low_matrix],
+                                         distance,
+                                         potentiel_statistique,
+                                         temps_key)
+
+    low_matrix.iloc[pos_x_low_matrix, pos_y_low_matrix] = energie
+    return low_matrix
+
+def dynamique_programming(low_matrix, x=1, y=1):
+    i = x
+    while (low_matrix.iloc[i+1, y+1] != 20 or
+           low_matrix.iloc[i, y+1] != 20 or
+           low_matrix.iloc[i+1, y] != 20):
+        if float(low_matrix.iloc[i, y+1]) < float(low_matrix.iloc[i+1, y+1]) and float(low_matrix.iloc[i, y+1]) < float(low_matrix.iloc[i+1, y]):
+            final_score = low_matrix.iloc[i, y+1]
+            y += 1
+        elif float(low_matrix.iloc[i+1, y+1]) < float(low_matrix.iloc[i, y+1]) and float(low_matrix.iloc[i+1, y+1]) < float(low_matrix.iloc[i+1, y]):
+            final_score = low_matrix.iloc[i+1, y+1]
+            i += 1
+            y += 1
+        else:
+            final_score = low_matrix.iloc[i+1, y]
+            i +=1
+    return y, i
 
 if __name__ == '__main__':
 
     # Message du début de programme.
     begin_message()
 
+    try:
+        link_pdb_file = str(sys.argv[1])
+        link_dope_file = str(sys.argv[2])
+    except IndexError:
+        sys.exit("Erreur d'argument : example d'utilisation\n"+
+                 "python main_threader.py ../data/pdb/2xri.pdb"+
+                 "../data/dope/dope.par")
+
+    pdb = ParserPdb_Dope(link_pdb_file)
     # Extraction des information du pdb.
-    pdb_file_dataframe = read_pdb_file_to_dataframe("../data/2019-09-10/2xri.pdb")
+    pdb_file_dataframe = pdb.read_pdb_file_to_dataframe()
 
     print("Informations du fichier .pdb :")
     print(pdb_file_dataframe)
 
     newline()
 
+    all_acide_amine = AcideAmine(pdb_file_dataframe)
+
     # Création de la matrice de distance ou matrice de contact.
-    distance_matrix = create_distance_matrix(pdb_file_dataframe)
+    distance_matrix = all_acide_amine.create_distance_matrix()
     print(distance_matrix)
 
     # Création de tout les couples AA possibles.
@@ -184,7 +251,7 @@ if __name__ == '__main__':
     expr_regular = create_regular_expression(all_pairwises_aa_list)
 
     # Création d'un dictionnaire stockant l'ensemble des potentiels statistiques.
-    pot_stat_dict = create_potentiel_stat_from_dope("../data/2019-13-10/dope.par",
+    pot_stat_dict = create_potentiel_stat_from_dope(link_dope_file,
                                                     all_pairwises_aa_list,
 
                                                     expr_regular)
@@ -212,82 +279,10 @@ if __name__ == '__main__':
     pos_y_low_matrix = 0
 
     print("Création de la low_matrice.")
-
     # Création de la low matrice
     low_matrix = create_empty_low_matrix(len(distance_matrix.columns),
                                          len(distance_matrix.columns),
                                          distance_matrix.columns)
-    print(low_matrix)
-
-
-
-    def built_low_matrix(pos_x_low_matrix,
-                         pos_y_low_matrix,
-                         aa_fixed_hight_matrix,
-                         pos_x_hight_matrix_fixed_position,
-                         pos_y_hight_matrix_fixed_position,
-                         ca_fixed_hight_matrix,
-                         low_matrix,
-                         potentiel_statistique,
-                         matrice_distance):
-        print("-----------------------------")
-        print("built low matrix")
-        print("Paramètres :")
-        print("Position low_matrix   x = {} y = {}.".format(pos_x_low_matrix,
-                                                            pos_y_low_matrix))
-        print("Position hight_matrix x = {} y = {}.".format(pos_x_hight_matrix,
-                                                            pos_y_hight_matrix))
-
-        print("Acide aminé fixé est {}.".format(aa_fixed_hight_matrix))
-        print("Avec un CA {} fixé".format(ca_fixed_hight_matrix))
-
-        temps_key = aa_fixed_hight_matrix+low_matrix.columns[pos_y_low_matrix]
-        print("La clée est {}".format(temps_key))
-
-        print("{} CA{} - {} CA{}".format(aa_fixed_hight_matrix,
-                                         ca_fixed_hight_matrix,
-                                         low_matrix.columns[pos_y_low_matrix],
-                                         low_matrix.index[pos_x_low_matrix]))
-        # Calculer une distance.
-        distance = matrice_distance.iloc[pos_y_hight_matrix,
-                                         pos_x_low_matrix]
-        print(distance)
-
-        energie = find_potentiel_statistique(aa_fixed_hight_matrix,
-                                             ca_fixed_hight_matrix,
-                                             low_matrix.columns[pos_y_low_matrix],
-                                             low_matrix.index[pos_x_low_matrix],
-                                             distance,
-                                             potentiel_statistique,
-                                             temps_key)
-        print("coucou")
-        print(energie)
-        print(pos_x_low_matrix)
-        print(pos_y_low_matrix)
-        print("coucou 2")
-        print(low_matrix.iloc[pos_x_low_matrix, pos_y_low_matrix])
-
-        low_matrix.iloc[pos_x_low_matrix, pos_y_low_matrix] = energie
-        return low_matrix
-
-
-    def dynamique_programming(low_matrix, x=1, y=1):
-        i = x
-        while (low_matrix.iloc[i+1, y+1] != 20 or
-               low_matrix.iloc[i, y+1] != 20 or
-               low_matrix.iloc[i+1, y] != 20):
-            if float(low_matrix.iloc[i, y+1]) < float(low_matrix.iloc[i+1, y+1]) and float(low_matrix.iloc[i, y+1]) < float(low_matrix.iloc[i+1, y]):
-                final_score = low_matrix.iloc[i, y+1]
-                y += 1
-            elif float(low_matrix.iloc[i+1, y+1]) < float(low_matrix.iloc[i, y+1]) and float(low_matrix.iloc[i+1, y+1]) < float(low_matrix.iloc[i+1, y]):
-                final_score = low_matrix.iloc[i+1, y+1]
-                i += 1
-                y += 1
-            else:
-                final_score = low_matrix.iloc[i+1, y]
-                i +=1
-        print("Best score : {} x:{} y:{}".format(final_score, y , i))
-        return y, i
 
     # variable car low matrice
     pos_x_low_matrix = 0
@@ -310,8 +305,6 @@ if __name__ == '__main__':
                                   pot_stat_dict,
                                   distance_matrix)
 
-    #pos_x_low_matrix, pos_y_low_matrix = dynamique_programming(low_matrix)
-    #print(pos_x_low_matrix, pos_y_low_matrix)
 
     # Modification des variable des postion low_matrice
     # On va vers la droite :

@@ -1,3 +1,4 @@
+
 import pandas as pd
 import numpy as np
 import math
@@ -53,13 +54,13 @@ class ParserPdb:
 
 class AcideAmine:
     """
-    Classe représentant l'ensemble des méthoes utilisés pour les acides aminés.
+    Classe représentant l'ensemble des méthodes utilisées pour les acides aminés.
     """
     def __init__(self, dataframe):
         self.dataframe = dataframe
 
     def euclidean_distance(self, dataframe, index, position = 1):
-        """Méthode aui retourne la distance euclidienne entre 2 acides aminés."""
+        """Méthode qui retourne la distance euclidienne entre 2 acides aminés."""
         xa = float(self.dataframe.iloc[index, 2])
         ya = float(self.dataframe.iloc[index, 3])
         za = float(self.dataframe.iloc[index, 4])
@@ -256,7 +257,7 @@ if __name__ == '__main__':
     distance_matrix = all_acide_amine.create_distance_matrix()
     print(distance_matrix)
 
-    # Création de tout les couples AA possibles.
+    # Création de tous les couples AA possibles.
     all_pairwises_aa_list = pairwise_amino_acide(pdb_file_dataframe)
 
     # Création de l'ensemblde des expressions régulières.
@@ -265,7 +266,6 @@ if __name__ == '__main__':
     # Création d'un dictionnaire stockant l'ensemble des potentiels statistiques.
     pot_stat_dict = create_potentiel_stat_from_dope(link_dope_file,
                                                     all_pairwises_aa_list,
-
                                                     expr_regular)
 
     # Création d'une matrice de haut niveau

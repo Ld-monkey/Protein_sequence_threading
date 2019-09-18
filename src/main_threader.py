@@ -133,7 +133,7 @@ def create_empty_hight_matrix(lenght_x, lenght_y, columns_names):
 
 def create_empty_low_matrix(lenght_x, lenght_y, columns_names):
     """ Méthode qui créé et retourne une matrice de haut niveau."""
-    low_matrix = np.full((lenght_x, lenght_y), fill_value =np.nan)
+    low_matrix = np.full((lenght_x, lenght_y), float(20),)
     low_matrix_seq = pd.DataFrame(low_matrix,
                                   columns = columns_names,
                                   index = np.arange(1,
@@ -141,7 +141,23 @@ def create_empty_low_matrix(lenght_x, lenght_y, columns_names):
                                                     1))
     return low_matrix_seq
 
+def find_potentiel_statistique(n, m, p, q, distance, potentiel, temp_key):
+    print("Potentiel_statistique")
+    if ( n == p and m == q):
+        return 0.0
+    if distance > 30*0.25:
+        return potentiel[temp_key].iloc[0,-1]
+    elif distance == 0.0:
+        return 10.0
+    else :
+        for i in range(0, len(potentiel[temp_key].columns)):
+            if potentiel[temp_key].columns[i] >= distance:
+                rst = float(potentiel[temp_key].iloc[0,i])
+                print(float(potentiel[temp_key].iloc[0,i]))
+                print(float(potentiel[temp_key].iloc[0,i-1]))
+                break
 
+    return rst
 
 
 if __name__ == '__main__':
@@ -189,60 +205,21 @@ if __name__ == '__main__':
     pos_x_hight_matrix = 0
     pos_y_hight_matrix = 0
 
-    pos_x_low_matrix = 0
-    pos_y_low_matrix = 0
-
-    print("{} CA{} {} CA{}".format(aa_hight_matrix[pos_y_hight_matrix],
-                                   ca_hight_matrix[pos_x_hight_matrix],
-                                   hight_matrix.columns[pos_y_low_matrix],
-                                   hight_matrix.index[pos_x_low_matrix]))
-    pos_y_low_matrix +=1
-    print("{} CA{} {} CA{}".format(aa_hight_matrix[pos_y_hight_matrix],
-                                   ca_hight_matrix[pos_x_hight_matrix],
-                                   hight_matrix.columns[pos_y_low_matrix],
-                                   hight_matrix.index[pos_x_low_matrix]))
-    pos_x_low_matrix += 1
-    print("{} CA{} {} CA{}".format(aa_hight_matrix[pos_y_hight_matrix],
-                                   ca_hight_matrix[pos_x_hight_matrix],
-                                   hight_matrix.columns[pos_y_low_matrix],
-                                   hight_matrix.index[pos_x_low_matrix]))
-    pos_y_low_matrix -= 1
-    print("{} CA{} {} CA{}".format(aa_hight_matrix[pos_y_hight_matrix],
-                                   ca_hight_matrix[pos_x_hight_matrix],
-                                   hight_matrix.columns[pos_y_low_matrix],
-                                   hight_matrix.index[pos_x_low_matrix]))
-
-    newline()
-    pos_x_hight_matrix = 0
-    pos_y_hight_matrix = 0
-
-    print("HM : AA={}, CA={}".format(aa_hight_matrix[pos_y_hight_matrix],
-                                     ca_hight_matrix[pos_x_hight_matrix]))
     AA = aa_hight_matrix[pos_y_hight_matrix]
     CA = ca_hight_matrix[pos_x_hight_matrix]
 
+    pos_x_low_matrix = 0
+    pos_y_low_matrix = 0
+
     print("Création de la low_matrice.")
 
+    # Création de la low matrice
     low_matrix = create_empty_low_matrix(len(distance_matrix.columns),
                                          len(distance_matrix.columns),
                                          distance_matrix.columns)
     print(low_matrix)
 
-    def find_potentiel_statistique(n, m, p, q, distance, potentiel, temp_key):
-        print("Potentiel_statistique")
-        if ( n == p and m == q):
-            print("coucou")
-            return 0.0
-        if distance > 30*0.25:
-            return potentiel[temp_key].iloc[0,-1]
-        else :
-            for i in range(0, len(potentiel[temp_key].columns)):
-                if potentiel[temp_key].columns[i] >= distance:
-                    rst = float(potentiel[temp_key].iloc[0,i])
-                    print(float(potentiel[temp_key].iloc[0,i]))
-                    break
 
-        return rst
 
     def built_low_matrix(pos_x_low_matrix,
                          pos_y_low_matrix,
@@ -283,6 +260,12 @@ if __name__ == '__main__':
                                              distance,
                                              potentiel_statistique,
                                              temps_key)
+        print("coucou")
+        print(energie)
+        print(pos_x_low_matrix)
+        print(pos_y_low_matrix)
+        print("coucou 2")
+        print(low_matrix.iloc[pos_x_low_matrix, pos_y_low_matrix])
 
         low_matrix.iloc[pos_x_low_matrix, pos_y_low_matrix] = energie
         return low_matrix
@@ -290,22 +273,28 @@ if __name__ == '__main__':
 
     def dynamique_programming(low_matrix, x=1, y=1):
         i = x
-        if low_matrix.iloc[i, y+1] < low_matrix.iloc[i+1, y+1] and low_matrix.iloc[i, y+1] < low_matrix.iloc[i+1, y]:
-            final_score = low_matrix.iloc[i, y+1]
-            y += 1
-        elif low_matrix.iloc[i+1, y+1] < low_matrix.iloc[i, y+1] and low_matrix.iloc[i+1, y+1] < low_matrix.iloc[i+1, y]:
-            final_score = low_matrix.iloc[i+1, y+1]
-            i += 1
-            y += 1
-        else:
-            final_score = low_matrix.iloc[i+1, y]
-            i +=1
-        print("Best score : ", final_score)
-        return i, y
+        while (low_matrix.iloc[i+1, y+1] != 20 or
+               low_matrix.iloc[i, y+1] != 20 or
+               low_matrix.iloc[i+1, y] != 20):
+            if float(low_matrix.iloc[i, y+1]) < float(low_matrix.iloc[i+1, y+1]) and float(low_matrix.iloc[i, y+1]) < float(low_matrix.iloc[i+1, y]):
+                final_score = low_matrix.iloc[i, y+1]
+                y += 1
+            elif float(low_matrix.iloc[i+1, y+1]) < float(low_matrix.iloc[i, y+1]) and float(low_matrix.iloc[i+1, y+1]) < float(low_matrix.iloc[i+1, y]):
+                final_score = low_matrix.iloc[i+1, y+1]
+                i += 1
+                y += 1
+            else:
+                final_score = low_matrix.iloc[i+1, y]
+                i +=1
+        print("Best score : {} x:{} y:{}".format(final_score, y , i))
+        return y, i
 
     # variable car low matrice
     pos_x_low_matrix = 0
     pos_y_low_matrix = 0
+
+    pos_x_initiale = pos_x_low_matrix
+    pos_y_initiale = pos_y_low_matrix
 
     # Ne bouge pas tant que la low matrice na pas finit
 
@@ -326,333 +315,20 @@ if __name__ == '__main__':
 
     # Modification des variable des postion low_matrice
     # On va vers la droite :
-    pos_y_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    # Au milieu
-    pos_x_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    # En bas
-    temps = pos_y_low_matrix
-    pos_y_low_matrix -= 1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
+    for i in range(0, 5):
+        pos_y_low_matrix +=1
+        low_matrix = built_low_matrix(pos_x_low_matrix, pos_y_low_matrix, AA, pos_x_hight_matrix,
+                                      pos_y_hight_matrix, CA, low_matrix, pot_stat_dict, distance_matrix)
+        pos_x_low_matrix +=1
+        low_matrix = built_low_matrix(pos_x_low_matrix, pos_y_low_matrix, AA, pos_x_hight_matrix,
+                                      pos_y_hight_matrix, CA, low_matrix, pot_stat_dict, distance_matrix)
+        temps = pos_y_low_matrix
+        pos_y_low_matrix -= 1
+        low_matrix = built_low_matrix(pos_x_low_matrix, pos_y_low_matrix, AA, pos_x_hight_matrix,
+                                      pos_y_hight_matrix, CA, low_matrix, pot_stat_dict, distance_matrix)
 
-    ## 2nd coups
-    pos_y_low_matrix = temps
-    pos_y_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    # Au milieu
-    pos_x_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    # En bas
-    temps = pos_y_low_matrix
-    pos_y_low_matrix -= 1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-
-    ## 3nd coups
-    pos_y_low_matrix = temps
-    pos_y_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    # Au milieu
-    pos_x_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    # En bas
-    temps = pos_y_low_matrix
-    pos_y_low_matrix -= 1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-
-    ## 4nd coups
-    pos_y_low_matrix = temps
-    pos_y_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    # Au milieu
-    pos_x_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    # En bas
-    temps = pos_y_low_matrix
-    pos_y_low_matrix -= 1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-
-    print("4eme")
-    print(low_matrix)
-
-    ## 5nd coups
-    pos_y_low_matrix = temps
-    pos_y_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    # Au milieu
-    pos_x_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    # En bas
-    temps = pos_y_low_matrix
-    pos_y_low_matrix -= 1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-
-    # 6nd coups
-    pos_y_low_matrix = temps
-    pos_y_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    # Au milieu
-    pos_x_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    # En bas
-    temps = pos_y_low_matrix
-    pos_y_low_matrix -= 1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-
-    # 7nd coups
-    pos_y_low_matrix = temps
-    pos_y_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    # Au milieu
-    pos_x_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    # En bas
-    temps = pos_y_low_matrix
-    pos_y_low_matrix -= 1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-
-    # 8nd coups
-    pos_y_low_matrix = temps
-    pos_y_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    # Au milieu
-    pos_x_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    
-    # En bas
-    temps = pos_y_low_matrix
-    pos_y_low_matrix -= 1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    # 9nd coups
-    pos_y_low_matrix = temps
-    pos_y_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    # Au milieu
-    pos_x_low_matrix +=1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-    
-    # En bas
-    temps = pos_y_low_matrix
-    pos_y_low_matrix -= 1
-    low_matrix = built_low_matrix(pos_x_low_matrix,
-                                  pos_y_low_matrix,
-                                  AA,
-                                  pos_x_hight_matrix,
-                                  pos_y_hight_matrix,
-                                  CA,
-                                  low_matrix,
-                                  pot_stat_dict,
-                                  distance_matrix)
-
+        pos_x_low_matrix, pos_y_low_matrix = dynamique_programming(low_matrix,
+                                                               pos_x_initiale,
+                                                               pos_y_initiale)
 
     print(low_matrix)
-    print(low_matrix.iloc[3, 3])
-

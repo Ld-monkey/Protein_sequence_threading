@@ -4,20 +4,22 @@ import math
 import re
 import sys
 
-def begin_message():
-    """ Méthode qui affiche différentes informations au démarrage du programme."""
+# -*- coding: utf-8 -*-
 
-    print("THREADER - Protein Sequence Threading Program")
-    print("Built date : September 2019")
-    print("usage : python3 main_threader.py\n")
+"""
+@author : Ft Ludovic
 
-def newline():
-    """ Méthode qui ajoute une nouvelle ligne en output."""
-    print("")
+Master II BIB - 2019 2020
 
-class ParserPdb_Dope:
+Projet cours:
+Réalisation d'un projet court sur l'application
+d'un algorithme d'enfilage de sequence protéique
+avec double programmation dynamique.
+"""
+
+class ParserPdb:
     """
-    Cette classe permet d'ouvrir le fichier pdb et dope.par.
+    Cette classe permet d'ouvrir le fichier pdb.
     """
     def __init__(self, pdb_file):
         self.pdb_file = pdb_file
@@ -87,6 +89,16 @@ class AcideAmine:
                                     index = index_and_columns_names,
                                     columns = index_and_columns_names)
         return dataframe_aa
+
+def begin_message():
+    """ Méthode qui affiche différentes informations au démarrage du programme."""
+    print("THREADER - Protein Sequence Threading Program")
+    print("Built date : September 2019")
+    print("usage : python3 main_threader.py\n")
+
+def newline():
+    """ Méthode qui ajoute une nouvelle ligne en output."""
+    print("")
 
 def pairwise_amino_acide(dataframe):
     """ Méthode qui revoie l'ensemble des couples AA possibles. """
@@ -229,7 +241,7 @@ if __name__ == '__main__':
                  "python main_threader.py ../data/pdb/2xri.pdb"+
                  "../data/dope/dope.par")
 
-    pdb = ParserPdb_Dope(link_pdb_file)
+    pdb = ParserPdb(link_pdb_file)
     # Extraction des information du pdb.
     pdb_file_dataframe = pdb.read_pdb_file_to_dataframe()
 
@@ -284,17 +296,9 @@ if __name__ == '__main__':
                                          len(distance_matrix.columns),
                                          distance_matrix.columns)
 
-    # variable car low matrice
-    pos_x_low_matrix = 0
-    pos_y_low_matrix = 0
-
     pos_x_initiale = pos_x_low_matrix
     pos_y_initiale = pos_y_low_matrix
 
-    # Ne bouge pas tant que la low matrice na pas finit
-
-    pos_x_hight_matrix = 0
-    pos_y_hight_matrix = 0
     low_matrix = built_low_matrix(pos_x_low_matrix,
                                   pos_y_low_matrix,
                                   AA,

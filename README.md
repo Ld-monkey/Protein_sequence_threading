@@ -5,16 +5,16 @@ Développement d'un programme en python 3 permettant de prédire une structure t
 
 ## Architecture du projet :
 ```bash
-.
+
 ├── bin
 ├── conda_threader.yml
 ├── data
-│   ├── 2019-09-10
-│   │   ├── 2xri.fasta
-│   │   ├── 2xri.fasta.txt
-│   │   └── 2xri.pdb
-│   └── 2019-13-10
-│       └── dope.par
+│   ├── dope
+│   │   └── dope.par
+│   └── pdb
+│       ├── 2xri.fasta
+│       ├── 2xri.fasta.txt
+│       └── 2xri.pdb
 ├── doc
 ├── README.md
 ├── results
@@ -32,7 +32,7 @@ Dans cette étude nous nous intéressons à la séquence protéique de la 2XRI f
 Il est préférable d'avoir activé l'environnement conda pour permettre la reproductibilité des données.
 
 ```bash
-python3 main_threader.py
+python main_threader.py ../data/pdb/2xri.pdb ../data/dope/dope.par 
 ```
 
 ## Resultats :
